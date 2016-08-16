@@ -14,7 +14,7 @@
         var self = this;
         // функция обновления
         var tick = function() {
-            self.update();
+            self.update(gameSize);
             self.draw(screen, gameSize);
             requestAnimationFrame(tick);
         }
@@ -25,8 +25,15 @@
     
     Game.prototype = {
         // функция обновления всех переменных 
-        update: function() {
-           for(var i = 0; i < this.bodies.length; i++) {
+        update: function(gsmeSize) {
+            console.log(this.bodies.length);
+            // массив удаления выстрелов
+            for(var i = 0; i < this.bodies.length; i++) {
+                if(this.bodies[i].position.y < 0) {
+                    this.bodies.splice(i,1);
+                }
+            }
+            for(var i = 0; i < this.bodies.length; i++) {
                 this.bodies[i].update();
             }
         },
@@ -47,6 +54,8 @@
     //функция игрока
     var Player = function(game, gameSize) {
         this.game = game;
+        this.bullets = 0;
+        this.timer = 0;
         this.size = {width:16, height:16};
         this.position = {x: gameSize.x/2-this.size.width/2, y:gameSize.y-this.size.height};
         this.keyboarder = new Keyboarder();
@@ -61,8 +70,17 @@
                 this.position.x += 2;
             }
             if (this.keyboarder.isSpace(this.keyboarder.KEYS.SPACE)) {
-                var bullet = new Bullet({x:this.position.x+this.size.width/2-3/2, y:this.position.y},{x:0,y:-6});
-                this.game.addBody(bullet);
+                if(this.bullets < 2) {
+                    
+                    var bullet = new Bullet({x:this.position.x+this.size.width/2-3/2, y:this.position.y},{x:0,y:-6});
+                    this.game.addBody(bullet);
+                    this.bullets++;
+                }
+            }
+            // увелечение переменной таймер
+            this.timer++;
+            if(this.timer % 12 == 0) {
+                this.bullets = 0;
             }
         }
     }
