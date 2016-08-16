@@ -58,6 +58,15 @@
         //функция добавляющая новое тело
         addBody: function(body) {
             this.bodies.push(body);
+        },
+        
+        //функция возвращающая значения true 
+        invadersBelow: function(invader) {
+            return this.bodies.filter(function(b) {
+                return b instanceof Invader &&
+                b.position.y > invader.position.y &&
+                b.position.x - invader.position.x < invader.size.width;
+            }).length > 0;
         }
     }
     
@@ -80,6 +89,11 @@
             
             this.position.x += this.speedX;
             this.patrolX += this.speedX;
+            
+            if(Math.random() < 0.02 && !this.game.invadersBelow(this)) {
+            var bullet = new Bullet({x:this.position.x+this.size.width/2-3/2, y:this.position.y+this.size.height/2},{x:Math.random()-0.5,y:2});
+                this.game.addBody(bullet);
+            }
         }
     }
     
