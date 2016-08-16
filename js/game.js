@@ -23,10 +23,20 @@
         tick(); 
     }
     
+    //игровой протатип
     Game.prototype = {
         // функция обновления всех переменных 
         update: function(gsmeSize) {
-            console.log(this.bodies.length);
+            var bodies = this.bodies;
+            // функция проверяющая столкновения b1 c другим объектом b2
+            var notCollidingWithAnything = function(b1) {
+                return bodies.filter(function(b2) {
+                    return colliding(b1, b2);
+                }).length == 0;
+            }
+            
+            this.bodies = this.bodies.filter(notCollidingWithAnything);
+            
             // массив удаления выстрелов
             for(var i = 0; i < this.bodies.length; i++) {
                 if(this.bodies[i].position.y < 0) {
@@ -60,6 +70,7 @@
         this.speedX = 5;
     }
     
+    // протатип врагов
     Invader.prototype = {
         //функция не дает выйди за рамки canvas'a
         update: function() {
@@ -81,7 +92,8 @@
         this.position = {x: gameSize.x/2-this.size.width/2, y:gameSize.y-this.size.height};
         this.keyboarder = new Keyboarder();
     }
-
+    
+    //протатип игрока
     Player.prototype = {
         update: function() {
             if(this.keyboarder.isLeft(this.keyboarder.KEYS.LEFT)) {
@@ -93,7 +105,7 @@
             if (this.keyboarder.isSpace(this.keyboarder.KEYS.SPACE)) {
                 if(this.bullets < 2) {
                     
-                    var bullet = new Bullet({x:this.position.x+this.size.width/2-3/2, y:this.position.y},{x:0,y:-6});
+                    var bullet = new Bullet({x:this.position.x+this.size.width/2-3/2, y:this.position.y},{x:0,y:-10});
                     this.game.addBody(bullet);
                     this.bullets++;
                 }
@@ -112,7 +124,8 @@
         this.position = position;
         this.velocity = velocity;
     }
-
+    
+    //протатип стрельбы
     Bullet.prototype = {
         update: function() {
             this.position.x += this.velocity.x;
@@ -158,6 +171,15 @@
             invaders.push(new Invader(game, {x:x, y:y}));
         }
         return invaders;
+    }
+    
+    //функция столкновения
+    var colliding = function(b1, b2) {
+        return !(b1 == b2 ||
+            b1.position.x + b1.size.width / 2 < b2.position.x - b2.size.width / 2 ||
+            b1.position.y + b1.size.height / 2 < b2.position.y - b2.size.height / 2 ||
+            b1.position.x - b1.size.width / 2 > b2.position.x + b2.size.width / 2 ||
+            b1.position.y - b1.size.height / 2 > b2.position.y + b2.size.height / 2);
     }
     
     //функция рисующиие обьекты 'body'
