@@ -12,15 +12,18 @@
         this.bodies = createInvaders(this).concat([new Player(this, gameSize)]);
         
         var self = this;
-        // функция обновления
-        var tick = function() {
-            self.update(gameSize);
-            self.draw(screen, gameSize);
-            requestAnimationFrame(tick);
-        }
-        
-        // вызывающая функция
-        tick(); 
+        loadSond("sound/shoot.wav", function(shootSound) {
+            self.shootSound = shootSound;
+            // функция обновления
+            var tick = function() {
+                self.update(gameSize);
+                self.draw(screen, gameSize);
+                requestAnimationFrame(tick);
+            }
+
+            // вызывающая функция
+            tick(); 
+        });
     }
     
     //игровой протатип
@@ -122,6 +125,8 @@
                     var bullet = new Bullet({x:this.position.x+this.size.width/2-3/2, y:this.position.y},{x:0,y:-10});
                     this.game.addBody(bullet);
                     this.bullets++;
+                    this.game.shootSound.load();
+                    this.game.shootSound.play();
                 }
             }
             // увелечение переменной таймер
@@ -194,6 +199,17 @@
             b1.position.y + b1.size.height / 2 < b2.position.y - b2.size.height / 2 ||
             b1.position.x - b1.size.width / 2 > b2.position.x + b2.size.width / 2 ||
             b1.position.y - b1.size.height / 2 > b2.position.y + b2.size.height / 2);
+    }
+    
+    //звуки
+    var loadSond = function(url, callback) {
+        var loaded = function() {
+            callback(sound);
+            sound.removeEventListener("canplaythrough", loaded);
+        }
+        var sound = new Audio(url);
+        sound.addEventListener("canplaythrough", loaded);
+        sound.load();
     }
     
     //функция рисующиие обьекты 'body'
