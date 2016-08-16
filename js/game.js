@@ -9,7 +9,7 @@
         };
         
         //массив объектов
-        this.bodies = [new Player(this, gameSize)];
+        this.bodies = createInvaders(this).concat([new Player(this, gameSize)]);
         
         var self = this;
         // функция обновления
@@ -48,6 +48,27 @@
         //функция добавляющая новое тело
         addBody: function(body) {
             this.bodies.push(body);
+        }
+    }
+    
+    //функция врагов
+    var Invader = function(game, positon) {
+        this.game = game;
+        this.size = {width:16, height:16};
+        this.position = positon;
+        this.patrolX = 0;
+        this.speedX = 5;
+    }
+    
+    Invader.prototype = {
+        //функция не дает выйди за рамки canvas'a
+        update: function() {
+            if(this.patrolX < 0 || this.patrolX > 500) {
+                this.speedX = -this.speedX;
+            }
+            
+            this.position.x += this.speedX;
+            this.patrolX += this.speedX;
         }
     }
     
@@ -124,6 +145,19 @@
         }
         
         this.KEYS = {LEFT: 37, RIGHT: 39, SPACE: 32};
+    }
+    
+    //функия захватчиков
+    var createInvaders = function(game) {
+        //массив захватчиков
+        var invaders = [];
+        //цикл
+        for(var i = 0; i < 24; i++) {
+            var x = 30 + (i%8) * 30;
+            var y = 30 + (i%3) * 30;
+            invaders.push(new Invader(game, {x:x, y:y}));
+        }
+        return invaders;
     }
     
     //функция рисующиие обьекты 'body'
